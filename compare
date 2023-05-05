@@ -1,0 +1,136 @@
+#include <iostream>
+#include <chrono>
+#include <ctime>
+#include <cstdlib>
+using namespace std;
+
+void merge(int arr[], int l, int m, int r) {
+    int n1 = m - l + 1;
+    int n2 = r - m;
+
+    int L[100], R[100];
+
+    for (int i = 0; i < n1; i++)
+        L[i] = arr[l + i];
+    for (int j = 0; j < n2; j++)
+        R[j] = arr[m + 1 + j];
+
+    int i = 0, j = 0, k = l;
+    while (i < n1 && j < n2) {
+        if (L[i] <= R[j]) {
+            arr[k] = L[i];
+            i++;
+        }
+        else {
+            arr[k] = R[j];
+            j++;
+        }
+        k++;
+    }
+
+    while (i < n1) {
+        arr[k] = L[i];
+        i++;
+        k++;
+    }
+
+    while (j < n2) {
+        arr[k] = R[j];
+        j++;
+        k++;
+    }
+}
+
+void mergeSort(int arr[], int l, int r) {
+    if (l < r) {
+        int m = l + (r - l) / 2;
+
+        mergeSort(arr, l, m);
+        mergeSort(arr, m + 1, r);
+
+        merge(arr, l, m, r);
+    }
+}
+void swap(int* a, int* b) {
+    int t = *a;
+    *a = *b;
+    *b = t;
+}
+
+int partition(int arr[], int low, int high) {
+    int pivot = arr[high];
+    int i = (low - 1);
+
+    for (int j = low; j <= high - 1; j++) {
+        if (arr[j] < pivot) {
+            i++;
+            swap(&arr[i], &arr[j]);
+        }
+    }
+    swap(&arr[i + 1], &arr[high]);
+    return (i + 1);
+}
+
+void quickSort(int arr[], int low, int high) {
+    if (low < high) {
+        int pi = partition(arr, low, high);
+
+        quickSort(arr, low, pi - 1);
+        quickSort(arr, pi + 1, high);
+    }
+}
+
+void printArray(int arr[], int size) {
+    int i;
+    for (i = 0; i < size; i++)
+        cout << arr[i] << " ";
+    cout << endl;
+}
+void fill_random(int array[], int length, int max)
+{
+
+    for (int i = 0; i < length; i++)
+        array[i] = (rand() % max) + 1;
+}
+int main() {
+    int n, arr[1000],a_quick[1000],a_merge[1000];
+    cout << "Enter the number of array: ";
+    cin >> n;
+    srand(time(NULL));
+    fill_random(arr,n, 1000);
+    cout << "\nRandom array is: ";
+    for (int i = 0; i < n; i++) {
+        cout << arr[i] << " ";
+    }
+    for (int i = 0; i < n; i++) {
+        a_quick[i]=arr[i];
+        a_merge[i] = arr[i];
+    }
+    
+    auto start_time_1 = chrono::high_resolution_clock::now();
+    mergeSort(a_merge, 0, n - 1);
+    auto end_time_1 = chrono::high_resolution_clock::now(); 
+   
+   
+    auto start_time_2 = chrono::high_resolution_clock::now();
+    quickSort(a_quick, 0, n - 1);
+    auto end_time_2 = chrono::high_resolution_clock::now(); 
+    cout << "\n";
+    cout << "\nMerge Sort array is: ";
+    for (int i = 0; i < n; i++) {
+        cout << a_merge[i] << " ";
+    }
+    cout << "\n";
+    cout << "\nQuick Sort array is: ";
+    for (int i = 0; i < n; i++) {
+        cout << a_quick[i] << " ";
+    }
+
+    auto elapsed_time_1 = chrono::duration_cast<chrono::microseconds>(end_time_1 - start_time_1); 
+    auto elapsed_time_2 = chrono::duration_cast<chrono::microseconds>(end_time_2 - start_time_2);
+    cout << "\n";
+    cout << "\nTime elapsed for merge sort: " << elapsed_time_1.count() << " us" << endl;
+    cout << "\nTime elapsed for quick sort: " << elapsed_time_2.count() << " us" << endl;
+    
+    return 0;
+}
